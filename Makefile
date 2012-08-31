@@ -42,11 +42,9 @@ MANSECTION = 3
 MANDIR     = $(PREFIX)/man/man$(MANSECTION)
 MANPAGE    = $(LIBRARY).$(MANSECTION)
 
-all: shared static
+all: shared
 
 shared: $(SOVERSION)
-
-static: $(STATICLIB)
 
 $(SOVERSION): $(OBJECTS)
 	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^
