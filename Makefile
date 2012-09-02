@@ -52,6 +52,16 @@ $(SOVERSION): $(OBJECTS)
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 
+install: all
+	mkdir -p $(DESTDIR)$(LIBDIR)
+	mkdir -p $(DESTDIR)$(INCLUDEDIR)
+	mkdir -p $(DESTDIR)$(MANDIR)
+	cp -f $(SOVERSION) $(DESTDIR)$(LIBDIR)
+	cp -f $(LIBRARY).h $(DESTDIR)$(INCLUDEDIR)
+	cp -f $(MANPAGE) $(DESTDIR)$(MANDIR)
+	ln -fs $(SOVERSION) $(DESTDIR)$(LIBDIR)/$(SONAME)
+	ln -fs $(SONAME) $(DESTDIR)$(LIBDIR)/$(SOFILE)
+
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(SOVERSION)
