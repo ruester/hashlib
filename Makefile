@@ -20,9 +20,11 @@ VERSION  = 0
 REVISION = 0
 
 # compiling and linking
-CC       = gcc
-CFLAGS   = -Wall -Wextra -g -fpic
-LDFLAGS  =
+CC           = gcc
+CFLAGS       = -Wall -Wextra -g -fpic
+LDFLAGS      =
+TEST_CFLAGS  = -Wall -Wextra -g
+TEST_LDFLAGS =
 
 LIBNAME   = lib$(LIBRARY)
 SOFILE    = $(LIBNAME).so
@@ -33,6 +35,13 @@ OBJECTS = $(LIBRARY).o
 
 LDFLAGS_SO = -shared -fpic -lc -Wl,-soname,$(SONAME)
 
+FNV_OBJECTS = hash_64a.o
+FNV_TEMP    = longlong.h
+
+TEST_SRC     = test.c
+TEST_OBJECT  = test.o
+TEST_PROGRAM = test
+
 # installing
 DESTDIR    =
 PREFIX     = /usr
@@ -42,15 +51,29 @@ MANSECTION = 3
 MANDIR     = $(PREFIX)/man/man$(MANSECTION)
 MANPAGE    = $(LIBRARY).$(MANSECTION)
 
-all: shared
+.PHONY: test
+
+all: fnv shared
 
 shared: $(SOVERSION)
 
+fnv:
+	$(MAKE) -f Makefile.fnv $(FNV_OBJECTS)
+
 $(SOVERSION): $(OBJECTS)
-	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^ $(FNV_OBJECTS)
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
+
+check: test
+
+test: all
+	ln -fs $(SOVERSION) $(SONAME)
+	ln -fs $(SONAME) $(SOFILE)
+	$(CC) -c $(TEST_SRC) $(TEST_CFLAGS)
+	$(CC) -o $(TEST_PROGRAM) $(TEST_OBJECT) -Wl,-rpath,. -L. -l$(LIBRARY) $(TEST_LDFLAGS)
+	@./$(TEST_PROGRAM)
 
 install: all
 	mkdir -p $(DESTDIR)$(LIBDIR)
@@ -63,5 +86,6 @@ install: all
 	ln -fs $(SONAME) $(DESTDIR)$(LIBDIR)/$(SOFILE)
 
 clean:
-	rm -f $(OBJECTS)
-	rm -f $(SOVERSION)
+	rm -f $(OBJECTS) $(FNV_OBJECTS) $(FNV_TEMP)
+	rm -f $(TEST_PROGRAM) $(TEST_OBJECT)
+	rm -f $(SOVERSION) $(SONAME) $(SOFILE)

@@ -20,4 +20,20 @@
 #ifndef HASHLIB_HASHLIB_H
 #define HASHLIB_HASHLIB_H
 
+#define HASHLIB_MAX_TBLSIZE ((unsigned) 1 << 31)
+
+#define hashlib_count(hash) (hash)->count
+
+struct hashlib_hash {
+    void **tbl;
+    unsigned int count;
+    unsigned int tblsize;
+};
+
+struct hashlib_hash *hashlib_hash_new(unsigned int size);
+void hashlib_put(struct hashlib_hash *hash, char *key, void *data);
+void *hashlib_get(struct hashlib_hash *hash, char *key);
+unsigned int hashlib_index(char *key);
+void hashlib_hash_delete(struct hashlib_hash *hash);
+
 #endif
