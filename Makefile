@@ -58,7 +58,7 @@ all: fnv shared
 shared: $(SOVERSION)
 
 fnv:
-	$(MAKE) -f Makefile.fnv $(FNV_OBJECTS)
+	@$(MAKE) --quiet -f Makefile.fnv $(FNV_OBJECTS)
 
 $(SOVERSION): $(OBJECTS)
 	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^ $(FNV_OBJECTS)
