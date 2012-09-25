@@ -184,6 +184,14 @@ void *hashlib_get(struct hashlib_hash *hash, char *key)
     return NULL;
 }
 
+extern void hashlib_set_free_function(struct hashlib_hash *hash,
+                               void (*free_function)(void *element))
+{
+    assert(hash);
+
+    hash->free_function = free_function;
+}
+
 extern void hashlib_hash_delete(struct hashlib_hash *hash)
 {
     unsigned int i;
