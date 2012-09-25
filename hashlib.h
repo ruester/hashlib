@@ -28,11 +28,12 @@ struct hashlib_hash {
     void **tbl;
     unsigned int count;
     unsigned int tblsize;
-    void (*free_function)(void *element);
+    void (*free_function)(void *e);
 };
 
 void hashlib_set_free_function(struct hashlib_hash *hash,
-                               void (*free_function)(void *element));
+                               void (*free_function)(void *e));
+void *hashlib_remove(struct hashlib_hash *hash, char *key);
 struct hashlib_hash *hashlib_hash_new(unsigned int size);
 void hashlib_put(struct hashlib_hash *hash, char *key, void *data);
 void *hashlib_get(struct hashlib_hash *hash, char *key);

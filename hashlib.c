@@ -35,6 +35,7 @@
 struct hashlib_entry {
     char *key;
     void *value;
+    void (*free_function)(void *e);
 };
 
 extern unsigned int hashlib_index(char *key)
@@ -48,7 +49,8 @@ extern unsigned int hashlib_index(char *key)
     return index;
 }
 
-static struct hashlib_entry *hashlib_entry_new(char *key, void *value)
+static struct hashlib_entry *hashlib_entry_new(char *key, void *value,
+                                               void (*free_function)(void *e))
 {
     struct hashlib_entry *e;
 
@@ -57,14 +59,19 @@ static struct hashlib_entry *hashlib_entry_new(char *key, void *value)
     if (!e)
         errf(EXIT_FAILURE, "calloc");
 
-    e->key   = key;
-    e->value = value;
+    e->key           = strdup(key);
+    e->value         = value;
+    e->free_function = free_function;
 
     return e;
 }
 
 static void hashlib_entry_delete(struct hashlib_entry *e)
 {
+    if (e->free_function)
+        e->free_function(e->value);
+
+    free(e->key);
     free(e);
 }
 
@@ -142,7 +149,7 @@ void hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 
     index = hashlib_index(key) % hash->tblsize;
 
-    e = hashlib_entry_new(key, value);
+    e = hashlib_entry_new(key, value, hash->free_function);
 
     ret = tsearch(e, &(hash->tbl[index]), hashlib_compare);
 
@@ -185,11 +192,39 @@ void *hashlib_get(struct hashlib_hash *hash, char *key)
 }
 
 extern void hashlib_set_free_function(struct hashlib_hash *hash,
-                               void (*free_function)(void *element))
+                               void (*free_function)(void *e))
 {
     assert(hash);
 
     hash->free_function = free_function;
+}
+
+extern void *hashlib_remove(struct hashlib_hash *hash, char *key)
+{
+    struct hashlib_entry *e;
+    struct hashlib_entry f;
+    void *ret;
+    unsigned int index;
+
+    assert(hash);
+    assert(key);
+
+    f.key = key;
+    index = hashlib_index(key) % hash->tblsize;
+
+    e = tfind(&f, &(hash->tbl[index]), hashlib_compare);
+
+    if (!e)
+        return NULL;
+
+    e   = *(struct hashlib_entry **) e;
+    ret = e->value;
+
+    tdelete(&f, &(hash->tbl[index]), hashlib_compare);
+
+    hashlib_entry_delete(e);
+
+    return ret;
 }
 
 extern void hashlib_hash_delete(struct hashlib_hash *hash)
