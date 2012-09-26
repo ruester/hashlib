@@ -21,7 +21,7 @@ REVISION = 0
 
 # compiling and linking
 CC           = gcc
-CFLAGS       = -Wall -Wextra -g -fpic
+CFLAGS       = -Wall -Wextra -g -fpic -O3
 LDFLAGS      =
 TEST_CFLAGS  = -Wall -Wextra -g
 TEST_LDFLAGS =
