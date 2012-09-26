@@ -35,7 +35,7 @@ void hashlib_set_free_function(struct hashlib_hash *hash,
                                void (*free_function)(void *e));
 void *hashlib_remove(struct hashlib_hash *hash, char *key);
 struct hashlib_hash *hashlib_hash_new(unsigned int size);
-void hashlib_put(struct hashlib_hash *hash, char *key, void *data);
+int hashlib_put(struct hashlib_hash *hash, char *key, void *data);
 void *hashlib_get(struct hashlib_hash *hash, char *key);
 unsigned int hashlib_index(char *key);
 void hashlib_hash_delete(struct hashlib_hash *hash);

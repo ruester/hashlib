@@ -137,7 +137,7 @@ static int hashlib_compare(const void *a, const void *b)
     return strcmp(e->key, f->key);
 }
 
-void hashlib_put(struct hashlib_hash *hash, char *key, void *value)
+int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 {
     unsigned int index;
     struct hashlib_entry *e;
@@ -158,12 +158,15 @@ void hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 
     r = *(struct hashlib_entry **) ret;
 
-    if (r != e)
+    if (r != e) {
         /* already in hash */
         hashlib_entry_delete(e);
-    else
-        /* e was inserted */
-        hash->count++;
+        return 0;
+    }
+
+    /* e was inserted */
+    hash->count++;
+    return 1;
 }
 
 void *hashlib_get(struct hashlib_hash *hash, char *key)
