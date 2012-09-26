@@ -285,7 +285,7 @@ void test6(void)
 
     count = 1000000;
 
-    hash = hashlib_hash_new(10000);
+    hash = hashlib_hash_new(3000000);
     hashlib_set_free_function(hash, translation_delete);
 
     arr = calloc(count, sizeof(*arr));
