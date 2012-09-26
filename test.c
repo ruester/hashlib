@@ -3,12 +3,15 @@
 #include <err.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 #include "hashlib.h"
 
 #define put(str) fputs((str), stdout)
 
-#define TEST(str) put("Testing " str ": ")
+#define TEST(str) do { put("Testing " str ": "); fflush(stdout); } while (0)
 
 struct translation {
     char *english;
@@ -89,6 +92,18 @@ void translation_delete(void *a)
     struct translation *t;
 
     t = (struct translation *) a;
+
+    if (t->english)
+        free(t->english);
+
+    if (t->latin)
+        free(t->latin);
+
+    if (t->german)
+        free(t->german);
+
+    if (t->french)
+        free(t->french);
 
     free(t);
 }
@@ -243,14 +258,87 @@ void test5(void)
         success();
 }
 
-#define TESTS 5
+void random_string(char *str, size_t len)
+{
+    size_t i, alnumlen;
+    static char alnum[] =
+        "1234567890"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    alnumlen = strlen(alnum);
+
+    for (i = 0; i < len - 1; i++)
+        str[i] = alnum[rand() % alnumlen];
+
+    str[len - 1] = '\0';
+}
+
+void test6(void)
+{
+    unsigned int count, i;
+    struct translation **arr;
+    struct hashlib_hash *hash;
+    char str[32];
+    struct timeval start, end;
+    long sec, usec;
+
+    count = 1000000;
+
+    hash = hashlib_hash_new(10000);
+    hashlib_set_free_function(hash, translation_delete);
+
+    arr = calloc(count, sizeof(*arr));
+
+    if (!arr)
+        err(EXIT_FAILURE, "calloc");
+
+    TEST("many entries");
+
+    for (i = 0; i < count; i++) {
+        random_string(str, 32);
+
+        arr[i]          = translation_new();
+        arr[i]->english = strdup(str);
+    }
+
+    gettimeofday(&start, NULL);
+
+    for (i = 0; i < count; i++)
+        hashlib_put(hash, arr[i]->english, arr[i]);
+
+    gettimeofday(&end, NULL);
+
+    sec  = end.tv_sec  - start.tv_sec;
+    usec = end.tv_usec - start.tv_usec;
+
+    if (usec < 0) {
+        usec += 1000000;
+        sec--;
+    }
+
+    printf("(%ld.%ld sec) ", sec, usec);
+
+    if (hashlib_count(hash) != count)
+        failed();
+    else
+        success();
+
+    hashlib_hash_delete(hash);
+
+    free(arr);
+}
+
+#define TESTS 6
 
 int main(void)
 {
     int i;
     void (*arr[TESTS])(void) = {
-        test1, test2, test3, test4, test5
+        test1, test2, test3, test4, test5, test6
     };
+
+    srand(time(NULL) + getpid());
 
     for (i = 0; i < TESTS; i++)
         arr[i]();
