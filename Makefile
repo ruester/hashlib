@@ -51,7 +51,7 @@ MANSECTION = 3
 MANDIR     = $(PREFIX)/man/man$(MANSECTION)
 MANPAGE    = $(LIBRARY).$(MANSECTION)
 
-.PHONY: test
+.PHONY: test install check shared all fnv clean
 
 all: fnv shared
 
