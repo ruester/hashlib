@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include "hashlib.h"
-#include "fnv.h"
 
 #define errf(exit, format, ...)  err((exit), "%s: " format, __func__, ## __VA_ARGS__)
 #define errfx(exit, format, ...) errx((exit), "%s: " format, __func__, ## __VA_ARGS__)
@@ -44,7 +43,12 @@ extern unsigned int hashlib_index(char *key)
 
     assert(key);
 
-    index = fnv_64a_str(key, FNV1_64_INIT);
+    index = 0;
+
+    while (*key) {
+        index = 5 * index + *key;
+        key++;
+    }
 
     return index;
 }
