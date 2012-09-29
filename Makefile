@@ -35,9 +35,6 @@ OBJECTS = $(LIBRARY).o
 
 LDFLAGS_SO = -shared -fpic -lc -Wl,-soname,$(SONAME)
 
-FNV_OBJECTS = hash_64a.o
-FNV_TEMP    = longlong.h
-
 TEST_SRC     = test.c
 TEST_OBJECT  = test.o
 TEST_PROGRAM = test
@@ -53,15 +50,12 @@ MANPAGE    = $(LIBRARY).$(MANSECTION)
 
 .PHONY: test install check shared all fnv clean
 
-all: fnv shared
+all: shared
 
 shared: $(SOVERSION)
 
-fnv:
-	@$(MAKE) --quiet -f Makefile.fnv $(FNV_OBJECTS)
-
 $(SOVERSION): $(OBJECTS)
-	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^ $(FNV_OBJECTS)
+	$(CC) $(LDFLAGS_SO) $(LDFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
@@ -86,6 +80,6 @@ install: all
 	ln -fs $(SONAME) $(DESTDIR)$(LIBDIR)/$(SOFILE)
 
 clean:
-	rm -f $(OBJECTS) $(FNV_OBJECTS) $(FNV_TEMP)
+	rm -f $(OBJECTS)
 	rm -f $(TEST_PROGRAM) $(TEST_OBJECT)
 	rm -f $(SOVERSION) $(SONAME) $(SOFILE)
