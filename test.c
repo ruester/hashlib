@@ -293,7 +293,7 @@ void test6(void)
     if (!arr)
         err(EXIT_FAILURE, "calloc");
 
-    TEST("many entries");
+    TEST("duration for 1 mio. entries");
 
     for (i = 0; i < count; i++) {
         random_string(str, 32);
@@ -320,12 +320,7 @@ void test6(void)
         sec--;
     }
 
-    printf("(%ld.%ld sec) ", sec, usec);
-
-    if (hashlib_count(hash) != count)
-        failed();
-    else
-        success();
+    printf("%ld.%ld sec.\n", sec, usec);
 
     hashlib_hash_delete(hash);
 
