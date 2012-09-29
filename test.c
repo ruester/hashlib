@@ -307,6 +307,9 @@ void test6(void)
     for (i = 0; i < count; i++)
         hashlib_put(hash, arr[i]->english, arr[i]);
 
+    for (i = 0; i < count; i++)
+        hashlib_get(hash, arr[i]->english);
+
     gettimeofday(&end, NULL);
 
     sec  = end.tv_sec  - start.tv_sec;
