@@ -34,10 +34,10 @@
 struct hashlib_entry {
     char *key;
     void *value;
-    void (*free_function)(void *e);
-    size_t (*size_function)(void *e);
-    void (*pack_function)(void *e, size_t bytes, int fd);
-    void *(*unpack_function)(void *data, size_t bytes);
+    HASHLIB_FP_FREE(free_function);
+    HASHLIB_FP_SIZE(size_function);
+    HASHLIB_FP_PACK(pack_function);
+    HASHLIB_FP_UNPACK(unpack_function);
 };
 
 static size_t hashlib_default_size_function(void *e)
