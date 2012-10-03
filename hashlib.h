@@ -24,6 +24,9 @@
 
 #define hashlib_count(hash) (hash)->count
 
+#define HASHLIB_FP_FREE(fname) \
+        void (*(fname))(void *)
+
 #define HASHLIB_FP_SIZE(fname) \
         size_t (*(fname))(void *)
 
@@ -37,14 +40,14 @@ struct hashlib_hash {
     void **tbl;
     unsigned int count;
     unsigned int tblsize;
-    void (*free_function)(void *e);
+    HASHLIB_FP_FREE(free_function);
     HASHLIB_FP_SIZE(size_function);
     HASHLIB_FP_PACK(pack_function);
     HASHLIB_FP_UNPACK(unpack_function);
 };
 
 void hashlib_set_free_function(struct hashlib_hash *hash,
-                               void (*free_function)(void *e));
+                               HASHLIB_FP_FREE(free_function));
 void hashlib_set_size_function(struct hashlib_hash *hash,
                                HASHLIB_FP_SIZE(size_function));
 void hashlib_set_pack_function(struct hashlib_hash *hash,

@@ -242,10 +242,9 @@ void *hashlib_get(struct hashlib_hash *hash, char *key)
 }
 
 extern void hashlib_set_free_function(struct hashlib_hash *hash,
-                               void (*free_function)(void *e))
+                                      HASHLIB_FP_FREE(free_function))
 {
     assert(hash);
-
     hash->free_function = free_function;
 }
 
