@@ -190,6 +190,7 @@ extern int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
     void *ret;
 
     assert(hash);
+    assert(key);
     assert(value);
 
     index = hashlib_index(key) % hash->tblsize;
@@ -213,6 +214,7 @@ extern int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 
     /* e was inserted */
     hash->count++;
+
     return 1;
 }
 
