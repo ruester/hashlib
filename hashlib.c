@@ -40,12 +40,12 @@ struct hashlib_entry {
     HASHLIB_FP_UNPACK(unpack_function);
 };
 
-static size_t hashlib_default_size_function(void *e)
+static HASHLIB_FCT_SIZE(hashlib_default_size_function, e)
 {
     return sizeof(e);
 }
 
-static void hashlib_default_pack_function(void *e, size_t bytes, int fd)
+static HASHLIB_FCT_PACK(hashlib_default_pack_function, e, bytes, fd)
 {
     int ret;
 
@@ -55,7 +55,7 @@ static void hashlib_default_pack_function(void *e, size_t bytes, int fd)
         errf(EXIT_FAILURE, "write");
 }
 
-static void *hashlib_default_unpack_function(void *data, size_t bytes)
+static HASHLIB_FCT_UNPACK(hashlib_default_unpack_function, data, bytes)
 {
     void *e;
 
