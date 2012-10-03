@@ -182,7 +182,7 @@ static int hashlib_compare(const void *a, const void *b)
     return strcmp(e->key, f->key);
 }
 
-int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
+extern int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 {
     unsigned int index;
     struct hashlib_entry *e;
@@ -216,7 +216,7 @@ int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
     return 1;
 }
 
-void *hashlib_get(struct hashlib_hash *hash, char *key)
+extern void *hashlib_get(struct hashlib_hash *hash, char *key)
 {
     unsigned int index;
     struct hashlib_entry *e;
@@ -255,14 +255,14 @@ extern void hashlib_set_size_function(struct hashlib_hash *hash,
     hash->size_function = size_function;
 }
 
-void hashlib_set_pack_function(struct hashlib_hash *hash,
+extern void hashlib_set_pack_function(struct hashlib_hash *hash,
                                HASHLIB_FP_PACK(pack_function))
 {
     assert(hash);
     hash->pack_function = pack_function;
 }
 
-void hashlib_set_unpack_function(struct hashlib_hash *hash,
+extern void hashlib_set_unpack_function(struct hashlib_hash *hash,
                                  HASHLIB_FP_UNPACK(unpack_function))
 {
     assert(hash);
