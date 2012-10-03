@@ -36,6 +36,18 @@
 #define HASHLIB_FP_UNPACK(fname) \
         void *(*(fname))(void *, size_t)
 
+#define HASHLIB_FCT_FREE(fname, arg) \
+        void (fname)(void *(arg))
+
+#define HASHLIB_FCT_SIZE(fname, arg) \
+        size_t (fname)(void *(arg))
+
+#define HASHLIB_FCT_PACK(fname, arg, bytes, fd) \
+        void (fname)(void *(arg), size_t (bytes), int (fd))
+
+#define HASHLIB_FCT_UNPACK(fname, arg, bytes) \
+        void *(fname)(void *(arg), size_t (bytes))
+
 struct hashlib_hash {
     void **tbl;
     unsigned int count;
