@@ -72,5 +72,6 @@ int hashlib_put(struct hashlib_hash *hash, char *key, void *data);
 void *hashlib_get(struct hashlib_hash *hash, char *key);
 unsigned int hashlib_index(char *key);
 void hashlib_hash_delete(struct hashlib_hash *hash);
+void hashlib_store(struct hashlib_hash *hash, char *filename);
 
 #endif

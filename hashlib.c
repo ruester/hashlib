@@ -25,11 +25,19 @@
 #include <stdlib.h>
 #include <search.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "hashlib.h"
 
+/* identifier 0x4A5411B0 */
+#define HASHLIB_FILE_HEADER (0xB011544A)
+
 #define errf(exit, format, ...)  err((exit), "%s: " format, __func__, ## __VA_ARGS__)
 #define errfx(exit, format, ...) errx((exit), "%s: " format, __func__, ## __VA_ARGS__)
+
+#define QUERY (-1)
+#define RESET (-2)
 
 struct hashlib_entry {
     char *key;
@@ -39,6 +47,55 @@ struct hashlib_entry {
     HASHLIB_FP_PACK(pack_function);
     HASHLIB_FP_UNPACK(unpack_function);
 };
+
+static inline int hashlib_open(const char *filename, int flags)
+{
+    int fd;
+
+    fd = open(filename, flags);
+
+    if (fd == -1)
+        errf(EXIT_FAILURE, "open");
+
+    return fd;
+}
+
+static inline void hashlib_close(int fd)
+{
+    int ret;
+
+    ret = close(fd);
+
+    if (ret == -1)
+        errf(EXIT_FAILURE, "close");
+}
+
+static inline void hashlib_write(int fd, void *data, size_t bytes)
+{
+    int ret;
+
+    ret = write(fd, data, bytes);
+
+    if (ret == -1)
+        errf(EXIT_FAILURE, "write");
+}
+
+static int hashlib_current_fd(int fd)
+{
+    static int cfd = QUERY;
+
+    if (fd == RESET) {
+        cfd = QUERY;
+        return RESET;
+    }
+
+    if (fd == QUERY)
+        assert(cfd != QUERY);
+    else
+        cfd = fd;
+
+    return cfd;
+}
 
 static HASHLIB_FCT_SIZE(hashlib_default_size_function, e)
 {
@@ -311,4 +368,81 @@ extern void hashlib_hash_delete(struct hashlib_hash *hash)
 
     free(hash->tbl);
     free(hash);
+}
+
+static void hashlib_store_action(const void *nodep,
+                                 const VISIT which,
+                                 const int depth)
+{
+    struct hashlib_entry *e;
+    int fd;
+    size_t bytes;
+    size_t keylen;
+
+    if (which == preorder || which == endorder)
+        return;
+
+    e = *(struct hashlib_entry **) nodep;
+
+    bytes = e->size_function(e);
+    fd    = hashlib_current_fd(QUERY);
+
+    /* write size */
+    hashlib_write(fd, &bytes, sizeof(bytes));
+
+    /* write data */
+    e->pack_function(e->value, bytes, fd);
+
+    keylen = strlen(e->key);
+
+    /* write length of key */
+    hashlib_write(fd, &keylen, sizeof(keylen));
+
+    /* write key */
+    hashlib_write(fd, e->key, sizeof(*(e->key)) * keylen);
+
+    return;
+
+    /* avoid gcc warning */
+    (void) depth;
+}
+
+static void hashlib_write_header(struct hashlib_hash *hash, int fd)
+{
+    int h;
+
+    assert(hash);
+    assert(fd >= 0);
+
+    h = HASHLIB_FILE_HEADER;
+
+    hashlib_write(fd, &h, sizeof(h));
+    hashlib_write(fd, &(hash->tblsize), sizeof(hash->tblsize));
+    hashlib_write(fd, &(hash->count), sizeof(hash->count));
+}
+
+extern void hashlib_store(struct hashlib_hash *hash, char *filename)
+{
+    int fd;
+    unsigned int i;
+
+    assert(hash);
+    assert(filename);
+
+    fd = hashlib_open(filename, O_WRONLY | O_TRUNC | O_CREAT);
+
+    hashlib_current_fd(fd);
+
+    hashlib_write_header(hash, fd);
+
+    for (i = 0; i < hash->tblsize; i++) {
+        if (!hash->tbl[i])
+            continue;
+
+        twalk(hash->tbl[i], hashlib_store_action);
+    }
+
+    hashlib_current_fd(RESET);
+
+    hashlib_close(fd);
 }
