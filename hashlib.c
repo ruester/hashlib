@@ -91,6 +91,18 @@ static inline void hashlib_write(int fd, void *data, size_t bytes)
         errf(EXIT_FAILURE, "write");
 }
 
+static inline size_t hashlib_read(int fd, void *buf, size_t bytes)
+{
+    ssize_t ret;
+
+    ret = read(fd, buf, bytes);
+
+    if (ret == -1)
+        errf(EXIT_FAILURE, "read");
+
+    return ret;
+}
+
 static int hashlib_current_fd(int fd)
 {
     static int cfd = QUERY;
