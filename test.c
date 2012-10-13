@@ -142,7 +142,7 @@ void success(void)
     puts("success");
 }
 
-void test1(void)
+void test_hashlib_get(void)
 {
     struct translation example;
     struct translation *a, *b, *c, *d, *p;
@@ -177,7 +177,7 @@ void test1(void)
     hashlib_hash_delete(hash);
 }
 
-void test2(void)
+void test_hashlib_count(void)
 {
     struct translation a, b;
     struct hashlib_hash *hash;
@@ -197,7 +197,7 @@ void test2(void)
     hashlib_hash_delete(hash);
 }
 
-void test3(void)
+void test_hashlib_remove(void)
 {
     struct hashlib_hash *hash;
     struct translation *p, *r;
@@ -224,7 +224,7 @@ void test3(void)
     hashlib_hash_delete(hash);
 }
 
-void test4(void)
+void test_free_function(void)
 {
     struct hashlib_hash *hash;
     unsigned long before, after;
@@ -254,7 +254,7 @@ void test4(void)
     hashlib_hash_delete(hash);
 }
 
-void test5(void)
+void test_hashlib_hash_delete(void)
 {
     unsigned long before, after;
     struct hashlib_hash *hash;
@@ -299,7 +299,7 @@ void random_string(char *str, size_t len)
     str[len - 1] = '\0';
 }
 
-void test6(void)
+void test_1mio_entries(void)
 {
     unsigned int count, i;
     struct translation **arr;
@@ -352,7 +352,7 @@ void test6(void)
     free(arr);
 }
 
-void test7(void)
+void test_hashlib_store(void)
 {
     const int count = 5;
     int i;
@@ -433,7 +433,7 @@ void test7(void)
     close(fd);
 }
 
-void test8(void)
+void test_hashlib_retrieve(void)
 {
     struct hashlib_hash *hash;
     const char *fname = "store.hashlib";
@@ -506,14 +506,14 @@ int main(void)
     int i;
     int size;
     void (*arr[])(void) = {
-        test1,
-        test2,
-        test3,
-        test4,
-        test5,
-        test6,
-        test7,
-        test8
+        test_hashlib_get,
+        test_hashlib_count,
+        test_hashlib_remove,
+        test_free_function,
+        test_hashlib_hash_delete,
+        test_1mio_entries,
+        test_hashlib_store,
+        test_hashlib_retrieve
     };
 
     srand(time(NULL) + getpid());
