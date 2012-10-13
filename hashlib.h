@@ -64,7 +64,7 @@ void hashlib_set_size_function(struct hashlib_hash *hash,
 void hashlib_set_pack_function(struct hashlib_hash *hash,
                                HASHLIB_FP_PACK(pack_function));
 void *hashlib_remove(struct hashlib_hash *hash, char *key);
-struct hashlib_hash *hashlib_hash_new(unsigned int size);
+struct hashlib_hash *hashlib_hash_new(size_t size);
 int hashlib_put(struct hashlib_hash *hash, char *key, void *data);
 void *hashlib_get(struct hashlib_hash *hash, char *key);
 unsigned int hashlib_index(char *key);

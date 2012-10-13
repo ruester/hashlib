@@ -207,7 +207,7 @@ static int isprime(unsigned int number)
     return number % div != 0;
 }
 
-extern struct hashlib_hash *hashlib_hash_new(unsigned int size)
+extern struct hashlib_hash *hashlib_hash_new(size_t size)
 {
     struct hashlib_hash *hash;
 
