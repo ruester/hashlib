@@ -35,6 +35,8 @@
 
 #define errf(exit, format, ...)  err((exit), "%s: " format, __func__, ## __VA_ARGS__)
 #define errfx(exit, format, ...) errx((exit), "%s: " format, __func__, ## __VA_ARGS__)
+#define dief(arg, ...)           errf(EXIT_FAILURE, arg, ## __VA_ARGS__)
+#define diefx(arg, ...)          errfx(EXIT_FAILURE, arg, ## __VA_ARGS__)
 
 #define QUERY (-1)
 #define RESET (-2)
