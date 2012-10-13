@@ -413,6 +413,74 @@ void test7(void)
     close(fd);
 }
 
+void test8(void)
+{
+    struct hashlib_hash *hash;
+    const char *fname = "store.hashlib";
+    struct xy *p;
+
+    TEST("hashlib_retrieve");
+
+    hash = hashlib_retrieve(fname, NULL);
+
+    if (!hash) {
+        failed();
+        return;
+    }
+
+    p = hashlib_get(hash, "1");
+
+    if (!p)
+        goto fail;
+
+    if (p->x != 0 || p->y != 1)
+        goto fail;
+
+    p = hashlib_get(hash, "2");
+
+    if (!p)
+        goto fail;
+
+    if (p->x != 2 || p->y != 3)
+        goto fail;
+
+    p = hashlib_get(hash, "3");
+
+    if (!p)
+        goto fail;
+
+    if (p->x != 4 || p->y != 5)
+        goto fail;
+
+    p = hashlib_get(hash, "4");
+
+    if (!p)
+        goto fail;
+
+    if (p->x != 6 || p->y != 7)
+        goto fail;
+
+    p = hashlib_get(hash, "5");
+
+    if (!p)
+        goto fail;
+
+    if (p->x != 8 || p->y != 9)
+        goto fail;
+
+    if (hashlib_count(hash) != 5)
+        goto fail;
+
+    hashlib_hash_delete(hash);
+    success();
+    return;
+
+fail:
+    hashlib_hash_delete(hash);
+    failed();
+    return;
+}
+
 int main(void)
 {
     int i;
@@ -424,7 +492,8 @@ int main(void)
         test4,
         test5,
         test6,
-        test7
+        test7,
+        test8
     };
 
     srand(time(NULL) + getpid());
