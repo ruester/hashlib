@@ -505,7 +505,6 @@ void test_hashlib_retrieve(void)
 fail:
     hashlib_hash_delete(hash);
     failed();
-    return;
 }
 
 int main(void)
