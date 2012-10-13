@@ -462,7 +462,8 @@ extern void hashlib_store(struct hashlib_hash *hash, const char *filename)
 }
 
 extern struct hashlib_hash *hashlib_retrieve(const char *filename,
-                                             HASHLIB_FP_UNPACK(unpack))
+                                             HASHLIB_FP_UNPACK(unpack),
+                                             HASHLIB_FP_FREE(ff))
 {
     struct hashlib_hash *hash;
     size_t tblsize;
@@ -498,6 +499,8 @@ extern struct hashlib_hash *hashlib_retrieve(const char *filename,
         diefx("%s: unable to read table size", filename);
 
     hash = hashlib_hash_new(tblsize);
+
+    hashlib_set_free_function(hash, ff);
 
     ret = hashlib_read(fd, &count, size);
 
