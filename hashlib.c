@@ -367,6 +367,8 @@ extern void *hashlib_remove(struct hashlib_hash *hash, char *key)
 
     hashlib_entry_delete(e);
 
+    hash->count--;
+
     return ret;
 }
 
