@@ -70,5 +70,7 @@ void *hashlib_get(struct hashlib_hash *hash, char *key);
 unsigned int hashlib_index(char *key);
 void hashlib_hash_delete(struct hashlib_hash *hash);
 void hashlib_store(struct hashlib_hash *hash, const char *filename);
+extern struct hashlib_hash *hashlib_retrieve(const char *filename,
+                                             HASHLIB_FP_UNPACK(unpack));
 
 #endif

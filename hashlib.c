@@ -458,3 +458,80 @@ extern void hashlib_store(struct hashlib_hash *hash, const char *filename)
 
     hashlib_close(fd);
 }
+
+extern struct hashlib_hash *hashlib_retrieve(const char *filename,
+                                             HASHLIB_FP_UNPACK(unpack))
+{
+    struct hashlib_hash *hash;
+    size_t tblsize;
+    size_t count;
+    size_t h;
+    size_t size;
+    size_t data_len;
+    size_t key_len;
+    size_t ret;
+    int fd;
+    void *data;
+    char *key;
+
+    size = sizeof(size_t);
+    data = key = NULL;
+
+    if (!unpack)
+        unpack = hashlib_default_unpack_function;
+
+    fd = hashlib_open(filename, O_RDONLY);
+
+    ret = hashlib_read(fd, &h, size);
+
+    if (ret != size)
+        errfx(EXIT_FAILURE, "%s: unable to read filetype", filename);
+
+    if (h != HASHLIB_FILE_HEADER)
+        errfx(EXIT_FAILURE, "%s: not a hashlib file", filename);
+
+    ret = hashlib_read(fd, &tblsize, size);
+
+    if (ret != size)
+        errfx(EXIT_FAILURE, "%s: unable to read table size", filename);
+
+    hash = hashlib_hash_new(tblsize);
+
+    ret = hashlib_read(fd, &count, size);
+
+    if (ret != size)
+        errfx(EXIT_FAILURE, "%s: unable to read entry count", filename);
+
+    while((ret = hashlib_read(fd, &data_len, size))) {
+        if (ret != size)
+            errfx(EXIT_FAILURE, "%s: unable to read size of data", filename);
+
+        data = hashlib_calloc(1, data_len);
+
+        ret = hashlib_read(fd, data, data_len);
+
+        if (ret != data_len)
+            errfx(EXIT_FAILURE, "%s: unable to read data", filename);
+
+        ret = hashlib_read(fd, &key_len, size);
+
+        if (ret != size)
+            errfx(EXIT_FAILURE, "%s: unable to read length of key", filename);
+
+        key = hashlib_calloc(1, key_len + 1);
+
+        ret = hashlib_read(fd, key, key_len);
+
+        if (ret != key_len)
+            errfx(EXIT_FAILURE, "%s: unable to read key", filename);
+
+        hashlib_put(hash, key, unpack(data, data_len));
+
+        free(data);
+        free(key);
+    }
+
+    hashlib_close(fd);
+
+    return hash;
+}
