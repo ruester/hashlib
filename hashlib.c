@@ -71,7 +71,7 @@ static inline void hashlib_close(int fd)
 
 static inline void hashlib_write(int fd, void *data, size_t bytes)
 {
-    int ret;
+    ssize_t ret;
 
     ret = write(fd, data, bytes);
 
