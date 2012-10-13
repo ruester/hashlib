@@ -55,7 +55,6 @@ struct hashlib_hash {
     HASHLIB_FP_FREE(free_function);
     HASHLIB_FP_SIZE(size_function);
     HASHLIB_FP_PACK(pack_function);
-    HASHLIB_FP_UNPACK(unpack_function);
 };
 
 void hashlib_set_free_function(struct hashlib_hash *hash,
@@ -64,8 +63,6 @@ void hashlib_set_size_function(struct hashlib_hash *hash,
                                HASHLIB_FP_SIZE(size_function));
 void hashlib_set_pack_function(struct hashlib_hash *hash,
                                HASHLIB_FP_PACK(pack_function));
-void hashlib_set_unpack_function(struct hashlib_hash *hash,
-                                 HASHLIB_FP_UNPACK(unpack_function));
 void *hashlib_remove(struct hashlib_hash *hash, char *key);
 struct hashlib_hash *hashlib_hash_new(unsigned int size);
 int hashlib_put(struct hashlib_hash *hash, char *key, void *data);

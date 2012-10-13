@@ -45,7 +45,6 @@ struct hashlib_entry {
     HASHLIB_FP_FREE(free_function);
     HASHLIB_FP_SIZE(size_function);
     HASHLIB_FP_PACK(pack_function);
-    HASHLIB_FP_UNPACK(unpack_function);
 };
 
 static inline int hashlib_open(const char *filename, int flags)
@@ -145,8 +144,7 @@ extern unsigned int hashlib_index(char *key)
 static struct hashlib_entry *hashlib_entry_new(char *key, void *value,
                                                HASHLIB_FP_FREE(free_function),
                                                HASHLIB_FP_SIZE(size_function),
-                                               HASHLIB_FP_PACK(pack_function),
-                                               HASHLIB_FP_UNPACK(unpack_function))
+                                               HASHLIB_FP_PACK(pack_function))
 {
     struct hashlib_entry *e;
 
@@ -160,7 +158,6 @@ static struct hashlib_entry *hashlib_entry_new(char *key, void *value,
     e->free_function   = free_function;
     e->size_function   = size_function;
     e->pack_function   = pack_function;
-    e->unpack_function = unpack_function;
 
     return e;
 }
@@ -218,7 +215,6 @@ extern struct hashlib_hash *hashlib_hash_new(unsigned int size)
     hash->tblsize         = size;
     hash->size_function   = hashlib_default_size_function;
     hash->pack_function   = hashlib_default_pack_function;
-    hash->unpack_function = hashlib_default_unpack_function;
 
     return hash;
 }
@@ -252,9 +248,8 @@ extern int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
 
     index = hashlib_index(key) % hash->tblsize;
 
-    e = hashlib_entry_new(key, value,
-                          hash->free_function, hash->size_function,
-                          hash->pack_function, hash->unpack_function);
+    e = hashlib_entry_new(key, value, hash->free_function,
+                          hash->size_function, hash->pack_function);
 
     ret = tsearch(e, &(hash->tbl[index]), hashlib_compare);
 
@@ -319,13 +314,6 @@ extern void hashlib_set_pack_function(struct hashlib_hash *hash,
 {
     assert(hash);
     hash->pack_function = pack_function;
-}
-
-extern void hashlib_set_unpack_function(struct hashlib_hash *hash,
-                                 HASHLIB_FP_UNPACK(unpack_function))
-{
-    assert(hash);
-    hash->unpack_function = unpack_function;
 }
 
 extern void *hashlib_remove(struct hashlib_hash *hash, char *key)
