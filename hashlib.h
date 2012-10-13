@@ -50,8 +50,8 @@
 
 struct hashlib_hash {
     void **tbl;
-    unsigned int count;
-    unsigned int tblsize;
+    size_t count;
+    size_t tblsize;
     HASHLIB_FP_FREE(free_function);
     HASHLIB_FP_SIZE(size_function);
     HASHLIB_FP_PACK(pack_function);

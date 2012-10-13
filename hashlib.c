@@ -409,7 +409,7 @@ static void hashlib_store_action(const void *nodep,
 
 static void hashlib_write_header(struct hashlib_hash *hash, int fd)
 {
-    int h;
+    size_t h;
 
     assert(hash);
     assert(fd >= 0);
