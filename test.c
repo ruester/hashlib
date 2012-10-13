@@ -245,13 +245,20 @@ void test_free_function(void)
 
     TEST("hashlib_remove with free_function");
 
-    if (after > before || hashlib_get(hash, "test"))
-        success(); /* failed(); */
+    if (hashlib_get(hash, "test") || hashlib_count(hash) > 0)
+        goto fail;
+
+    if (after > before)
+        (void) 1; /* goto fail; */
         /* get_VmRSS is sometimes not working as expected */
-    else
-        success();
 
     hashlib_hash_delete(hash);
+    success();
+    return;
+
+fail:
+    hashlib_hash_delete(hash);
+    failed();
 }
 
 void test_hashlib_hash_delete(void)
