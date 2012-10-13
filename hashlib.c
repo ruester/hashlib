@@ -47,6 +47,18 @@ struct hashlib_entry {
     HASHLIB_FP_PACK(pack_function);
 };
 
+static inline void *hashlib_calloc(size_t nmemb, size_t size)
+{
+    void *p;
+
+    p = calloc(nmemb, size);
+
+    if (!p)
+        errf(EXIT_FAILURE, "calloc");
+
+    return p;
+}
+
 static inline int hashlib_open(const char *filename, int flags)
 {
     int fd;
