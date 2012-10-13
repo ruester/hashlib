@@ -61,11 +61,11 @@ static inline void *hashlib_calloc(size_t nmemb, size_t size)
     return p;
 }
 
-static inline int hashlib_open(const char *filename, int flags)
+static inline int hashlib_open(const char *filename, int flags, mode_t modes)
 {
     int fd;
 
-    fd = open(filename, flags);
+    fd = open(filename, flags, modes);
 
     if (fd == -1)
         dief("open");
@@ -443,7 +443,7 @@ extern void hashlib_store(struct hashlib_hash *hash, const char *filename)
     assert(hash);
     assert(filename);
 
-    fd = hashlib_open(filename, O_WRONLY | O_TRUNC | O_CREAT);
+    fd = hashlib_open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 
     hashlib_current_fd(fd);
 
@@ -482,7 +482,7 @@ extern struct hashlib_hash *hashlib_retrieve(const char *filename,
     if (!unpack)
         unpack = hashlib_default_unpack_function;
 
-    fd = hashlib_open(filename, O_RDONLY);
+    fd = hashlib_open(filename, O_RDONLY, 0);
 
     ret = hashlib_read(fd, &h, size);
 
