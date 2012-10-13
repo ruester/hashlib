@@ -441,7 +441,7 @@ void test_hashlib_retrieve(void)
 
     TEST("hashlib_retrieve");
 
-    hash = hashlib_retrieve(fname, NULL);
+    hash = hashlib_retrieve(fname, NULL, free);
 
     if (!hash) {
         failed();
