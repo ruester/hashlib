@@ -421,7 +421,7 @@ static void hashlib_write_header(struct hashlib_hash *hash, int fd)
     hashlib_write(fd, &(hash->count), sizeof(hash->count));
 }
 
-extern void hashlib_store(struct hashlib_hash *hash, char *filename)
+extern void hashlib_store(struct hashlib_hash *hash, const char *filename)
 {
     int fd;
     unsigned int i;
