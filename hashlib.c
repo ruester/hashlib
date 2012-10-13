@@ -56,7 +56,7 @@ static inline void *hashlib_calloc(size_t nmemb, size_t size)
     p = calloc(nmemb, size);
 
     if (!p)
-        errf(EXIT_FAILURE, "calloc");
+        dief("calloc");
 
     return p;
 }
@@ -68,7 +68,7 @@ static inline int hashlib_open(const char *filename, int flags)
     fd = open(filename, flags);
 
     if (fd == -1)
-        errf(EXIT_FAILURE, "open");
+        dief("open");
 
     return fd;
 }
@@ -80,7 +80,7 @@ static inline void hashlib_close(int fd)
     ret = close(fd);
 
     if (ret == -1)
-        errf(EXIT_FAILURE, "close");
+        dief("close");
 }
 
 static inline void hashlib_write(int fd, void *data, size_t bytes)
@@ -90,7 +90,7 @@ static inline void hashlib_write(int fd, void *data, size_t bytes)
     ret = write(fd, data, bytes);
 
     if (ret == -1)
-        errf(EXIT_FAILURE, "write");
+        dief("write");
 }
 
 static inline size_t hashlib_read(int fd, void *buf, size_t bytes)
@@ -100,7 +100,7 @@ static inline size_t hashlib_read(int fd, void *buf, size_t bytes)
     ret = read(fd, buf, bytes);
 
     if (ret == -1)
-        errf(EXIT_FAILURE, "read");
+        dief("read");
 
     return ret;
 }
@@ -134,7 +134,7 @@ static HASHLIB_FCT_PACK(hashlib_default_pack_function, e, bytes, fd)
     ret = write(fd, e, bytes);
 
     if (ret == -1)
-        errf(EXIT_FAILURE, "write");
+        dief("write");
 }
 
 static HASHLIB_FCT_UNPACK(hashlib_default_unpack_function, data, bytes)
@@ -144,7 +144,7 @@ static HASHLIB_FCT_UNPACK(hashlib_default_unpack_function, data, bytes)
     e = malloc(bytes);
 
     if (!e)
-        errf(EXIT_FAILURE, "malloc");
+        dief("malloc");
 
     memcpy(e, data, bytes);
 
@@ -177,7 +177,7 @@ static struct hashlib_entry *hashlib_entry_new(char *key, void *value,
     e = calloc(1, sizeof(*e));
 
     if (!e)
-        errf(EXIT_FAILURE, "calloc");
+        dief("calloc");
 
     e->key             = strdup(key);
     e->value           = value;
@@ -214,15 +214,15 @@ extern struct hashlib_hash *hashlib_hash_new(size_t size)
     struct hashlib_hash *hash;
 
     if (size > HASHLIB_MAX_TBLSIZE)
-        errfx(EXIT_FAILURE, "table size too big");
+        diefx("table size too big");
 
     if (size <= 0)
-        errfx(EXIT_FAILURE, "table size must be greater than zero");
+        diefx("table size must be greater than zero");
 
     hash = calloc(1, sizeof(*hash));
 
     if (!hash)
-        errf(EXIT_FAILURE, "calloc(hash)");
+        dief("calloc(hash)");
 
     /* the next five lines of code are taken from glibc's misc/hsearch_r.c */
     if (size < 3)
@@ -236,7 +236,7 @@ extern struct hashlib_hash *hashlib_hash_new(size_t size)
     hash->tbl = calloc(size, sizeof(*(hash->tbl)));
 
     if (!hash->tbl)
-        errf(EXIT_FAILURE, "calloc(hash->tbl)");
+        dief("calloc(hash->tbl)");
 
     hash->tblsize         = size;
     hash->size_function   = hashlib_default_size_function;
@@ -280,7 +280,7 @@ extern int hashlib_put(struct hashlib_hash *hash, char *key, void *value)
     ret = tsearch(e, &(hash->tbl[index]), hashlib_compare);
 
     if (!ret)
-        errf(EXIT_FAILURE, "tsearch");
+        dief("tsearch");
 
     r = *(struct hashlib_entry **) ret;
 
@@ -487,45 +487,45 @@ extern struct hashlib_hash *hashlib_retrieve(const char *filename,
     ret = hashlib_read(fd, &h, size);
 
     if (ret != size)
-        errfx(EXIT_FAILURE, "%s: unable to read filetype", filename);
+        diefx("%s: unable to read filetype", filename);
 
     if (h != HASHLIB_FILE_HEADER)
-        errfx(EXIT_FAILURE, "%s: not a hashlib file", filename);
+        diefx("%s: not a hashlib file", filename);
 
     ret = hashlib_read(fd, &tblsize, size);
 
     if (ret != size)
-        errfx(EXIT_FAILURE, "%s: unable to read table size", filename);
+        diefx("%s: unable to read table size", filename);
 
     hash = hashlib_hash_new(tblsize);
 
     ret = hashlib_read(fd, &count, size);
 
     if (ret != size)
-        errfx(EXIT_FAILURE, "%s: unable to read entry count", filename);
+        diefx("%s: unable to read entry count", filename);
 
     while((ret = hashlib_read(fd, &data_len, size))) {
         if (ret != size)
-            errfx(EXIT_FAILURE, "%s: unable to read size of data", filename);
+            diefx("%s: unable to read size of data", filename);
 
         data = hashlib_calloc(1, data_len);
 
         ret = hashlib_read(fd, data, data_len);
 
         if (ret != data_len)
-            errfx(EXIT_FAILURE, "%s: unable to read data", filename);
+            diefx("%s: unable to read data", filename);
 
         ret = hashlib_read(fd, &key_len, size);
 
         if (ret != size)
-            errfx(EXIT_FAILURE, "%s: unable to read length of key", filename);
+            diefx("%s: unable to read length of key", filename);
 
         key = hashlib_calloc(1, key_len + 1);
 
         ret = hashlib_read(fd, key, key_len);
 
         if (ret != key_len)
-            errfx(EXIT_FAILURE, "%s: unable to read key", filename);
+            diefx("%s: unable to read key", filename);
 
         hashlib_put(hash, key, unpack(data, data_len));
 
