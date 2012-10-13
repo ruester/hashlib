@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <fcntl.h>
 
 #include "hashlib.h"
 
@@ -20,6 +21,10 @@ struct translation {
     char *latin;
 };
 
+struct xy {
+    int x;
+    int y;
+};
 
 int read_value(char *line)
 {
@@ -327,18 +332,106 @@ void test6(void)
     free(arr);
 }
 
-#define TESTS 6
+void test7(void)
+{
+    const int count = 5;
+    int i;
+    int fd;
+    struct hashlib_hash *hash;
+    struct xy values[count];
+    size_t r;
+    ssize_t ret;
+    const char *fname = "store.hashlib";
+    size_t compare[19] = {
+            0xB011544A,
+            0x3F1,
+            0x5,
+            0x8,
+            0x100000000,
+            0x1,
+            0x831,
+            0x30000000200,
+            0x100,
+            0x83200,
+            0x5000000040000,
+            0x10000,
+            0x8330000,
+            0x700000006000000,
+            0x1000000,
+            0x834000000,
+            0x800000000,
+            0x100000009,
+            0x3500000000,
+        };
+
+    TEST("hashlib_store");
+
+    hash = hashlib_hash_new(1000);
+
+    for (i = 0; i < count; i++) {
+        values[i].x = i * 2;
+        values[i].y = i * 2 + 1;
+    }
+
+    hashlib_put(hash, "1", &values[0]); /* 0 1 */
+    hashlib_put(hash, "2", &values[1]); /* 2 3 */
+    hashlib_put(hash, "3", &values[2]); /* 4 5 */
+    hashlib_put(hash, "4", &values[3]); /* 6 7 */
+    hashlib_put(hash, "5", &values[4]); /* 8 9 */
+
+    hashlib_store(hash, fname);
+
+    hashlib_hash_delete(hash);
+
+    fd = open(fname, O_RDONLY);
+
+    if (fd == -1)
+        failed();
+
+    i = 0;
+
+    while ((ret = read(fd, &r, sizeof(r))) != -1) {
+        if (compare[i++] != r) {
+            failed();
+            return;
+        }
+
+        if (ret != sizeof(r))
+            break;
+
+        if (i >= 19) {
+            failed();
+            return;
+        }
+    }
+
+    if (i != 19)
+        failed();
+    else
+        success();
+
+    close(fd);
+}
 
 int main(void)
 {
     int i;
-    void (*arr[TESTS])(void) = {
-        test1, test2, test3, test4, test5, test6
+    int size;
+    void (*arr[])(void) = {
+        test1,
+        test2,
+        test3,
+        test4,
+        test5,
+        test6,
+        test7
     };
 
     srand(time(NULL) + getpid());
 
-    for (i = 0; i < TESTS; i++)
+    size = sizeof(arr) / sizeof(*arr);
+
+    for (i = 0; i < size; i++)
         arr[i]();
 
     return 0;
