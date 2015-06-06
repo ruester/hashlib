@@ -18,6 +18,9 @@
 ***/
 
 #ifndef HASHLIB_HASHLIB_H
+
+#include <stdlib.h>
+
 #define HASHLIB_HASHLIB_H
 
 #define HASHLIB_MAX_TBLSIZE ((unsigned) 1 << 31)
