@@ -17,7 +17,7 @@
 
 LIBRARY  = hashlib
 VERSION  = 0
-REVISION = 0
+REVISION = 1
 
 # compiling and linking
 CC           = gcc
