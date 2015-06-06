@@ -313,12 +313,13 @@ extern void *hashlib_get(struct hashlib_hash *hash, char *key)
     f.key = key;
 
     e = tfind(&f, &(hash->tbl[index]), hashlib_compare);
+
+    if (!e)
+        return NULL;
+
     e = *(struct hashlib_entry **) e;
 
-    if (e)
-        return e->value;
-
-    return NULL;
+    return e->value;
 }
 
 extern void hashlib_set_free_function(struct hashlib_hash *hash,
